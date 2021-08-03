@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math"
 )
 
 type FiguraGeometrica interface {
@@ -20,6 +21,10 @@ func GenerarReporte(figura FiguraGeometrica) {
 
 func GenerarFiguraGeometrica(numeroLados int, valores ...int) (FiguraGeometrica, error) {
 	switch numeroLados {
+	case 0:
+		circulo := Circulo{0}
+		circulo.Llenar(valores)
+		return &circulo, nil
 	case 3:
 		triangulo := Triangulo{}
 		triangulo.Llenar(valores)
@@ -70,12 +75,84 @@ func (r Rectangulo) Perimetro() int {
 }
 
 type Triangulo struct {
-	Base   int
-	Altura int
+	Base    int
+	Altura  int
+	LadoUno int
+	LadoDos int
+}
+
+func (t Triangulo) Area() int {
+	return t.Base * t.Altura / 2
+}
+
+func (t *Triangulo) Llenar(valores []int) error {
+	if len(valores) != 4 {
+		return errors.New("No se puede generar un triangulo con menos de cuatro valores")
+	}
+
+	if valores[0] <= 0 {
+		return errors.New("No se puede generar un triangulo con una base menor o igual que cero")
+	}
+
+	if valores[1] <= 0 {
+		return errors.New("No se puede generar un triangulo si su altura es menor o igual que cero")
+	}
+
+	if valores[2] <= 0 {
+		return errors.New("No se puede generar un triangulo si uno de sus lados es menor o igual que cero")
+	}
+
+	if valores[3] <= 0 {
+		return errors.New("No se puede generar un triangulo si uno de sus lados es menor o igual que cero")
+	}
+
+	t.Base = valores[0]
+	t.Altura = valores[1]
+	t.LadoUno = valores[2]
+	t.LadoDos = valores[3]
+
+	return nil
+}
+
+func (t Triangulo) Nombre() string {
+	return "Triangulo"
+}
+
+func (t Triangulo) Perimetro() int {
+	return t.Base + t.LadoUno + t.LadoDos
+}
+
+type Circulo struct {
+	Radio float64
+}
+
+func (c Circulo) Area() int {
+	return int(math.Pi * c.Radio * c.Radio)
+}
+
+func (c *Circulo) Llenar(valores []int) error {
+
+	if len(valores) != 1 {
+		errors.New("No se puede generar ")
+	}
+	if valores[0] <= 0 {
+		errors.New("No se puede generar un circulo con un radio menor que cero")
+	}
+
+	c.Radio = float64(valores[0])
+	return nil
+}
+
+func (c Circulo) Nombre() string {
+	return "Circulo"
+}
+
+func (c Circulo) Perimetro() int {
+	return int(2 * math.Pi * c.Radio)
 }
 
 func main() {
-	miFigura, err := GenerarFiguraGeometrica(4, 2, 2)
+	miFigura, err := GenerarFiguraGeometrica(0, 3)
 	if err != nil {
 		fmt.Println(err.Error())
 	} else {
